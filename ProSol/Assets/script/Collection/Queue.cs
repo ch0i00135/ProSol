@@ -19,11 +19,13 @@ public class Queue<Template>
 {
     private Node<Template> head;
     private Node<Template> tail;
+    private int count;
 
     public Queue()
     {
         head = null;
         tail = null;
+        count = 0;
     }
 
     public void Enqueue(Template data)
@@ -39,6 +41,7 @@ public class Queue<Template>
             tail.next = newNode;
             tail = newNode;
         }
+        count++;
     }
 
     public Template Dequeue()
@@ -58,13 +61,6 @@ public class Queue<Template>
 
     public int Count()
     {
-        int count = 0;
-        Node<Template> current = head;
-        while (current != null)
-        {
-            count++;
-            current = current.next;
-        }
         return count;
     }
 }
