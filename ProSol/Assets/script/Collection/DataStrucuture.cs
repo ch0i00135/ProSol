@@ -76,20 +76,29 @@ namespace DataStrucuture
 
     public class Stack<T>
     {
-        public Queue<T> queue;        
+        public Queue<T> queue;
+        public int count;
 
         public Stack() 
         {
             queue=new Queue<T> ();
+            count=0;
         }
         public void Push(T data) 
         {
             queue.Enqueue(data);
+            count++;
         }
         public T Pop()
         {
             Queue<T> empty=new Queue<T>();
-            empty.Enqueue(queue.Dequeue());
+            for(int i=1; i<count; i++)
+            {
+                empty.Enqueue(queue.Dequeue());
+            }
+            T data = empty.Dequeue();
+            queue = empty;
+            return data;
         }    
     }
 }
