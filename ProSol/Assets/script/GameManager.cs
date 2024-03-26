@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
+using DataStrucuture;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
