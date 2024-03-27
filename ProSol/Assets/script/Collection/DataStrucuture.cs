@@ -88,17 +88,28 @@ namespace DataStrucuture
         {
             queue.Enqueue(data);
             count++;
+            Debug.Log(count);
         }
         public T Pop()
         {
-            Queue<T> empty=new Queue<T>();
-            for(int i=1; i<count; i++)
+            if (count == 1)
             {
-                empty.Enqueue(queue.Dequeue());
+                count--;
+                return queue.Dequeue();
             }
-            T data = empty.Dequeue();
-            queue = empty;
-            return data;
+            else
+            {
+                Queue<T> empty = new Queue<T>();
+                for (int i = 1; i < count; i++)
+                {
+                    empty.Enqueue(queue.Dequeue());
+                }
+                T data = queue.Dequeue();
+                queue = empty;
+                count--;
+                Debug.Log(count);
+                return data;
+            }
         }    
     }
 }
