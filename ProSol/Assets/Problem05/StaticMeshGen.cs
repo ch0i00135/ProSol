@@ -15,7 +15,7 @@ public class StaticMeshGenEditor : Editor
         if (GUILayout.Button("Generate Mesh"))
         {
             script.GenerateMesh();
-        }        
+        }
         if (GUILayout.Button("Remove Mesh"))
         {
             script.Remove();
@@ -27,37 +27,66 @@ public class StaticMeshGenEditor : Editor
 //메쉬만들기 예제
 public class StaticMeshGen : MonoBehaviour
 {
+    public Material material;
+    public float rot;
     // Start is called before the first frame update
     public void GenerateMesh()
     {
         Mesh mesh = new Mesh();
 
-        Vector3[] vertices = new Vector3[]
-        {
-            new Vector3(1.0f, 2.0f, 0.0f),
-            new Vector3(1.25f, 1.25f, 0.0f),
-            new Vector3(2.0f, 1.22f, 0.0f),
-            new Vector3(1.4f, 0.75f, 0.0f),
-            new Vector3(1.7f, 0.0f, 0.0f),
-            new Vector3(1.0f, 0.45f, 0.0f),
-            new Vector3(0.4f, 0.0f, 0.0f),
-            new Vector3(0.6f, 0.8f, 0.0f),
-            new Vector3(0.0f, 1.22f, 0.0f),
-            new Vector3(0.75f, 1.25f, 0.0f),
-            
-            new Vector3(1.0f, 2.0f, 5.0f),
-            new Vector3(1.25f, 1.25f, 5.0f),
-            new Vector3(2.0f, 1.22f, 5.0f),
-            new Vector3(1.4f, 0.75f, 5.0f),
-            new Vector3(1.7f, 0.0f, 5.0f),
-            new Vector3(1.0f, 0.45f, 5.0f),
-            new Vector3(0.4f, 0.0f, 5.0f),
-            new Vector3(0.6f, 0.8f, 5.0f),
-            new Vector3(0.0f, 1.22f, 5.0f),
-            new Vector3(0.75f, 1.25f, 5.0f),
-        };
+        //Vector3[] vertices = new Vector3[]
+        //{
+        //    new Vector3(1.0f, 2.0f, 0.0f),
+        //    new Vector3(1.25f, 1.25f, 0.0f),
+        //    new Vector3(2.0f, 1.22f, 0.0f),
+        //    new Vector3(1.4f, 0.75f, 0.0f),
+        //    new Vector3(1.7f, 0.0f, 0.0f),
+        //    new Vector3(1.0f, 0.45f, 0.0f),
+        //    new Vector3(0.4f, 0.0f, 0.0f),
+        //    new Vector3(0.6f, 0.8f, 0.0f),
+        //    new Vector3(0.0f, 1.22f, 0.0f),
+        //    new Vector3(0.75f, 1.25f, 0.0f),
 
-        mesh.vertices = vertices;
+        //    new Vector3(1.0f, 2.0f, 5.0f),
+        //    new Vector3(1.25f, 1.25f, 5.0f),
+        //    new Vector3(2.0f, 1.22f, 5.0f),
+        //    new Vector3(1.4f, 0.75f, 5.0f),
+        //    new Vector3(1.7f, 0.0f, 5.0f),
+        //    new Vector3(1.0f, 0.45f, 5.0f),
+        //    new Vector3(0.4f, 0.0f, 5.0f),
+        //    new Vector3(0.6f, 0.8f, 5.0f),
+        //    new Vector3(0.0f, 1.22f, 5.0f),
+        //    new Vector3(0.75f, 1.25f, 5.0f),
+        //};
+
+        float r1 = 1.0f;  // 상단 동심원 반지름
+        float r2 = 0.4f;  // 하단 동심원 반지름
+        float height = 5.0f;  // 기둥의 높이
+
+        Vector3[] vertices = new Vector3[20];  // 상단 10개 + 하단 10개
+
+        // 상단 동심원 정점 계산
+        for (int i = 0; i < 5; i++)
+        {
+            float angle = rot+(2 * Mathf.PI * i) / 5;
+            vertices[i*2] = new Vector3(Mathf.Cos(angle) * r1, Mathf.Sin(angle) * r1, height);
+        }
+        for (int i = 0; i < 5; i++)
+        {
+            float angle = rot + (Mathf.PI / 5) + (2 * Mathf.PI * i) / 5;
+            vertices[i*2+1] = new Vector3(Mathf.Cos(angle) * r2, Mathf.Sin(angle) * r2, height);
+        }
+        //하단
+        for (int i = 0; i < 5; i++)
+        {
+            float angle = rot + (2 * Mathf.PI * i) / 5;
+            vertices[i * 2+10] = new Vector3(Mathf.Cos(angle) * r1, Mathf.Sin(angle) * r1, 0);
+        }
+        for (int i = 0; i < 5; i++)
+        {
+            float angle = rot + (Mathf.PI / 5) + (2 * Mathf.PI * i) / 5;
+            vertices[i * 2 + 11] = new Vector3(Mathf.Cos(angle) * r2, Mathf.Sin(angle) * r2, 0);
+        }
 
         int[] triangleIndices = new int[]
         {
@@ -101,17 +130,38 @@ public class StaticMeshGen : MonoBehaviour
             9,19,0,
             19,10,0,
         };
+        Vector3[] normals = new Vector3[vertices.Length];
 
+        for (int i = 0; i < triangleIndices.Length; i += 3)
+        {
+            int i1 = triangleIndices[i];
+            int i2 = triangleIndices[i + 1];
+            int i3 = triangleIndices[i + 2];
+
+            Vector3 side1 = vertices[i2] - vertices[i1];
+            Vector3 side2 = vertices[i3] - vertices[i1];
+            Vector3 normal = Vector3.Cross(side1, side2).normalized;
+
+            normals[i1] += normal;
+            normals[i2] += normal;
+            normals[i3] += normal;
+        }
+        for (int i = 0; i < normals.Length; i++)
+        {
+            normals[i] = normals[i].normalized;
+        }
+
+        mesh.vertices = vertices;
+        mesh.normals = normals;
         mesh.triangles = triangleIndices;
-
         MeshFilter mf = this.AddComponent<MeshFilter>();
         MeshRenderer mr = this.AddComponent<MeshRenderer>();
 
         mf.mesh = mesh;
 
         // Shader 설정
-        Material material = new Material(Shader.Find("Standard"));
-        material.color = Color.yellow;
+        //Material material = new Material(Shader.Find("Unlit/Yellow"));
+        //material.color = Color.yellow;
         mr.material = material;
     }
 
@@ -124,6 +174,6 @@ public class StaticMeshGen : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }
