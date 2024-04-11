@@ -2,15 +2,15 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(StaticMeshGen))]
-public class StaticMeshGenEditor : Editor
+[CustomEditor(typeof(StaticMeshGen2))]
+public class StaticMeshGenEditor2 : Editor
 {
     //버튼만들기 예제
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
 
-        StaticMeshGen script = (StaticMeshGen)target;
+        StaticMeshGen2 script = (StaticMeshGen2)target;
 
         if (GUILayout.Button("Generate Mesh"))
         {
@@ -25,7 +25,7 @@ public class StaticMeshGenEditor : Editor
 }
 
 //메쉬만들기 예제
-public class StaticMeshGen : MonoBehaviour
+public class StaticMeshGen2 : MonoBehaviour
 {
     public Material material;
     public float rot;
@@ -36,7 +36,7 @@ public class StaticMeshGen : MonoBehaviour
                 
         float r1 = 1.0f;  // 외부 반지름
         float r2 = 0.4f;  // 내부 반지름
-        float height = 5.0f;  // 기둥의 높이
+        float height = 2.0f;  // 기둥의 높이
 
         Vector3[] vertices = new Vector3[20];  // 상단 10개 + 하단 10개
 
@@ -107,7 +107,7 @@ public class StaticMeshGen : MonoBehaviour
         };
         Vector3[] normals = new Vector3[vertices.Length];
 
-        for (int i = 0; i < triangleIndices.Length; i += 3)
+        for (int i = 0; i < triangleIndices.Length; i+=3)
         {
             int i1 = triangleIndices[i];
             int i2 = triangleIndices[i + 1];
@@ -125,6 +125,7 @@ public class StaticMeshGen : MonoBehaviour
         {
             normals[i] = normals[i].normalized;
         }
+        Debug.Log($"normals length: {normals.Length}, mesh normals length: {mesh.normals.Length}, ");
 
         mesh.vertices = vertices;
         mesh.normals = normals;

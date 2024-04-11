@@ -45,7 +45,7 @@ Shader "Unlit/YellowShader"
             {
                 // sample the texture
                 //float4 col = float4(255.0f,255.0f,0.0f,1.0f);
-                float lightDir = normalize(_LightDirection);
+                float3 lightDir = normalize(_LightDirection);
                 float lightIntensity = max(dot(i.normal,lightDir),0);
 
                 //col *= _DiffuseColor * lightIntensity;

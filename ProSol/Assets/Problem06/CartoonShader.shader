@@ -1,14 +1,15 @@
-Shader "Unlit/YellowCartoonShader"
+Shader "CartoonShader"
 {
     Properties
     {
         _DiffuseColor("DiffuseColor", Color) = (1,1,1,1)
-        _LightDirection("LightDirection", Vector) = (1,-1,-1,0)
+        _LightDirection("LightDirection", Vector) = (0,0,0,0)
+        _Threshold("Threshold", Range(0.01, 1)) = 0.3
+        _Smoothness("Smoothness", Range(0.01, 1)) = 0.1
     }
     SubShader
     {
         Tags { "RenderType"="Opaque" }
-
 
         Pass
         {
@@ -28,31 +29,37 @@ Shader "Unlit/YellowCartoonShader"
             {
                 float4 vertex : SV_POSITION;
                 float3 normal : NORMAL;
+                float3 viewDir : TEXCOORD0;
             };
 
             float4 _DiffuseColor;
             float4 _LightDirection;
+            float _Threshold;
+            float _Smoothness;
 
             v2f vert (appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.normal = v.normal;
+                o.normal = normalize(UnityObjectToWorldNormal(v.normal));
+                o.viewDir = normalize(UnityWorldSpaceViewDir(v.vertex));
                 return o;
             }
 
             fixed4 frag (v2f i) : SV_Target
             {
-                // sample the texture
-                //float4 col = float4(255.0f,255.0f,0.0f,1.0f);
                 float3 lightDir = normalize(_LightDirection);
-                float lightIntensity = max(dot(i.normal,lightDir),0);
+                float lightIntensity = max(dot(i.normal, lightDir), 0);
+                
+                float3 halfDir = normalize(lightDir + i.viewDir);
+                float specIntensity = pow(max(dot(i.normal, halfDir), 0), 10.0f);
+                
+                float4 col = _DiffuseColor * lightIntensity + float4(1, 1, 1, 1) * specIntensity * _Smoothness;
 
-                //col *= _DiffuseColor * lightIntensity;
-                float4 col = _DiffuseColor * lightIntensity;
+                float4 banding = floor(col / _Threshold);
+                float4 finalIntensity = banding * _Threshold;
 
-
-                return col;
+                return finalIntensity;
             }
             ENDCG
         }
