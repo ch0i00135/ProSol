@@ -53,8 +53,7 @@ public class PlayerController : MonoBehaviour
             Vector3 newPosition = transform.position + correctedMoveDirection * moveSpeed * Time.deltaTime;
             transform.position = newPosition;
         }
-
-        Camera.main.transform.LookAt(transform.position);
+        
     }
 
     // 캐릭터를 중심으로 카메라를 원형 경로에 따라 회전시키는 함수
@@ -73,6 +72,7 @@ public class PlayerController : MonoBehaviour
         while (elapsedTime < 1f)
         {
             Camera.main.transform.rotation = Quaternion.Slerp(startRotation, targetRotation, elapsedTime);
+            Camera.main.transform.position = new Vector3(20f / elapsedTime, 25f, elapsedTime / 20f);
             elapsedTime += Time.deltaTime / 1f;
             yield return null;
         }
