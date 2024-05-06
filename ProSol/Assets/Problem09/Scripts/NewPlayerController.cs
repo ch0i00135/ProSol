@@ -7,23 +7,26 @@ public class NewPlayerController : MonoBehaviour
 {
     public GameObject head;
 
-    float moveSpeed = 15f;
-    float worldAngle = -45f;
+    GameObject cameraObj;
+    bool rot = false;
+    float moveSpeed = 5f;
+    public static float worldAngle = -45f;
 
     void Start()
     {
-
+        cameraObj = GameObject.Find("CameraObj");
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.O))
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
+        if (Input.GetKeyDown(KeyCode.O) && !rot)
         {
-
+            StartCoroutine(rotateAngle(90f));
         }
-        if (Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.P) && !rot)
         {
-
+            StartCoroutine(rotateAngle(-90f));
         }
         if (Input.GetKey(KeyCode.W))
         {
@@ -49,17 +52,26 @@ public class NewPlayerController : MonoBehaviour
             transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
 
         }
-        //if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))
-        //{
-        //    transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
-        //}
+        transform.rotation = Quaternion.Euler(0f, worldAngle, 0f);
+        cameraObj.transform.rotation = Quaternion.Euler(0f, worldAngle, 0f);
     }
     void rotateHead(float dir)
     {
         head.transform.rotation = Quaternion.Euler(0f, dir + worldAngle, 0f);
     }
-    void rotateCamera(float dir)
-    {
 
+    IEnumerator rotateAngle(float dir)
+    {
+        rot = true;
+        float angle = worldAngle;
+        float elapsedTime = 0;
+        float totalTime = 1f;
+        while (elapsedTime < totalTime)
+        {
+            elapsedTime += Time.deltaTime;
+            worldAngle = angle + dir * elapsedTime;
+            yield return null;
+        }
+        rot = false;
     }
 }
